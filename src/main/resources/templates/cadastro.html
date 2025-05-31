@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-screen">
+
+<div class="flex h-screen">
+
+  <div class="flex-1 flex items-center justify-center bg-white">
+    <div class="w-96">
+      <h2 class="text-3xl font-semibold text-[#5b3921] mb-6">Cadastro</h2>
+      <form th:action="@{/save}" method="post"> <div class="mb-4">
+        <label class="block mb-1 text-gray-700" for="nome">Nome completo</label>
+        <input class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#5b3921]" type="text" id="nome" name="nome" placeholder="Digite seu nome" required />
+      </div>
+        <div class="mb-4">
+          <label class="block mb-1 text-gray-700" for="telefone">Telefone</label>
+          <input class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#5b3921]" type="tel" id="telefone" name="telefone" placeholder="(XX) XXXXX-XXXX" required />
+        </div>
+        <div class="mb-4">
+          <label class="block mb-1 text-gray-700" for="email">Email</label>
+          <input class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#5b3921]" type="email" id="email" name="email" placeholder="Digite seu email" required />
+        </div>
+        <div class="mb-4">
+          <label class="block mb-1 text-gray-700" for="senha">Senha</label>
+          <input class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#5b3921]" type="password" id="senha" name="senha" placeholder="Digite sua senha" required />
+        </div>
+        <div class="mb-4">
+          <label class="block mb-1 text-gray-700" for="confirma-senha">Confirmar senha</label>
+          <input class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#5b3921]" type="password" id="confirma-senha" placeholder="Confirme sua senha" required />
+        </div>
+        <button type="submit" class="w-full bg-[#5b3921] hover:bg-[#412b18] text-white p-2 rounded-md transition">Cadastrar</button>
+        <p class="text-center text-sm mt-4">Já tem uma conta?
+          <a class="text-[#5b3921] hover:underline" th:href="@{/login}">Faça login</a>
+        </p>
+        <p class="text-center text-sm mt-4">É um negócio?
+          <a class="^text-[#5b3921] hover:underline" th:href="@{/cadastroBarbearia}">Clique aqui!</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <div class="h-screen flex-1 bg-[#fbf8f7]">
+    <img class="max-h-full object-cover" src="img/back_1.png" alt="Imagem de barbearia" />
+  </div>
+
+</div>
+
+</body>
+</html>

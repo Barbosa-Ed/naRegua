@@ -1,9 +1,7 @@
 package br.com.kwave.naRegua.models;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "barbearias")
 public class Barbearia {
 
     @Id

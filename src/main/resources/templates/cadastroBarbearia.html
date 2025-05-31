@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro de Barbearia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-screen bg-gray-100">
+
+<div class="flex h-screen">
+
+  <!-- Formulário -->
+  <div class="flex-1 flex items-center justify-center bg-white">
+    <div class="w-full max-w-lg p-8">
+      <h2 class="text-3xl font-semibold text-[#5b3921] mb-6 text-center">Cadastro de Barbearia</h2>
+
+      <form action="#" method="POST" class="space-y-4">
+        <!-- Nome do Salão -->
+        <div>
+          <label class="block mb-1 text-gray-700" for="nomeSalao">Nome do Salão</label>
+          <input class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#5b3921]"
+                 type="text" id="nomeSalao" name="nomeSalao" placeholder="Ex.: Barbearia Top" required />
+        </div>
+
+        <!-- Nome de Usuário -->
+        <div>
+          <label class="block mb-1 text-gray-700" for="usuario">Nome de Usuário</label>
+          <input class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#5b3921]"
+                 type="text" id="usuario" name="usuario" placeholder="Usuário para login" required />
+        </div>
+
+        <!-- CEP e Número -->
+        <div class="flex gap-4">
+          <div class="flex-1">
+            <label class="block mb-1 text-gray-700" for="cep">CEP</label>
+            <input class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#5b3921]"
+                   type="text" id="cep" name="cep" placeholder="XXXXX-XXX" required />
+          </div>
+          <div class="w-32">
+            <label class="block mb-1 text-gray-700" for="numero">Número</label>
+            <input class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#5b3921]"
+                   type="text" id="numero" name="numero" placeholder="Nº" required />
+          </div>
+        </div>
+
+        <!-- Telefone -->
+        <div>
+          <label class="block mb-1 text-gray-700" for="telefone">Telefone</label>
+          <input class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#5b3921]"
+                 type="tel" id="telefone" name="telefone" placeholder="(XX) XXXXX-XXXX" required />
+        </div>
+
+        <!-- Tipo de Serviço -->
+        <div>
+          <label class="block mb-2 text-gray-700">Tipo de Serviço</label>
+          <div class="flex gap-6">
+            <label class="flex items-center">
+              <input type="checkbox" name="servico" value="masculino"
+                     class="w-4 h-4 text-[#5b3921] border-gray-300 rounded focus:ring-[#5b3921]" />
+              <span class="ml-2 text-gray-700">Masculino</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="servico" value="feminino"
+                     class="w-4 h-4 text-[#5b3921] border-gray-300 rounded focus:ring-[#5b3921]" />
+              <span class="ml-2 text-gray-700">Feminino</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="servico" value="sobrancelha"
+                     class="w-4 h-4 text-[#5b3921] border-gray-300 rounded focus:ring-[#5b3921]" />
+              <span class="ml-2 text-gray-700">Sobrancelha</span>
+            </label>
+          </div>
+        </div>
+
+        <button class="w-full bg-[#5b3921] hover:bg-[#412b18] text-white p-2 rounded-md transition">
+          Cadastrar Barbearia
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="flex-1 hidden lg:block bg-[#faf9f4]">
+    <img class="max-h-full object-cover" src="img/back_2.png" alt="Imagem Barbearia">
+  </div>
+
+</div>
+
+</body>
+</html>

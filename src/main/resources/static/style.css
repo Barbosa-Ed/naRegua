@@ -127,3 +127,63 @@ main {
   padding: 0.5rem;
   font-size: 0.9rem;
 }
+
+/*eh */
+
+.login-container {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 350px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #5b3921;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 0.3rem;
+  color: #333;
+}
+
+input {
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 0.7rem;
+  background-color: #5b3921;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0000ff;
+}
+
+p {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+a {
+  color: #5b3921;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
