@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil da Barbearia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-sans bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+<header class="flex justify-between items-center bg-white p-4 border-b border-gray-200 shadow-sm">
+  <div class="text-2xl font-bold text-[#5b3921]" th:text="${barbearia.nome}">Nome da Barbearia</div>
+  <a href="/" class="text-[#5b3921] hover:underline">Voltar</a>
+</header>
+
+<main class="flex-grow p-8">
+  <section class="mb-6">
+    <img th:src="${barbearia.urlFotoPerfil}" alt="Foto da Barbearia" class="w-64 h-40 object-cover rounded-lg" />
+    <p class="mt-2 text-gray-700" th:text="${barbearia.endereco}">Endereço</p>
+    <p class="mt-1 text-gray-700" th:text="${barbearia.telefone}">Telefone</p>
+  </section>
+
+  <section>
+    <h2 class="text-xl font-semibold mb-4">Serviços</h2>
+    <div th:if="${#lists.isEmpty(servicos)}">
+      <p>Esta barbearia ainda não adicionou serviços.</p>
+    </div>
+    <ul class="space-y-4" th:if="${!#lists.isEmpty(servicos)}">
+      <li th:each="servico : ${servicos}" class="p-4 bg-white rounded-lg shadow-md">
+        <h3 class="text-lg font-semibold" th:text="${servico.nome}">Nome do Serviço</h3>
+        <p class="text-gray-600" th:text="${servico.descricao}">Descrição do serviço</p>
+        <p class="text-gray-800 font-semibold" th:text="'R$ ' + ${servico.preco}">Preço</p>
+        <button class="mt-2 px-4 py-2 bg-[#5b3921] text-white rounded hover:bg-[#4a2f18]">Escolher Serviço</button>
+      </li>
+    </ul>
+    <a th:href="@{'/negocios/adicionarServico/' + ${barbearia.id}}" class="inline-block mt-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Adicionar Serviço</a>
+  </section>
+</main>
+
+</body>
+</html>

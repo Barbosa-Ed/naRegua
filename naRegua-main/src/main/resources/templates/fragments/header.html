@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Header Fragment</title>
+</head>
+<body>
+
+<header th:fragment="mainHeader" class="bg-[#5b3921] p-4 text-white shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+        <a th:href="@{/}" class="text-2xl font-bold">NaRégua</a>
+        <nav>
+            <ul class="flex space-x-4">
+                <li><a th:href="@{/index}" class="hover:underline">Início</a></li>
+                <li><a th:href="@{/servicos}" class="hover:underline">Serviços</a></li>
+                <li><a th:href="@{/contato}" class="hover:underline">Contato</a></li>
+                <li th:if="${session.loggedInUser}"> Olá, <span th:text="${session.loggedInUser.nome}"></span>!
+                </li>
+                <li th:if="${session.loggedInUser}">
+                    <a th:href="@{/logout}" class="hover:underline">Sair</a>
+                </li>
+                <li th:unless="${session.loggedInUser}"> <a th:href="@{/login}" class="hover:underline">Login</a>
+                </li>
+                <li th:unless="${session.loggedInUser}">
+                    <a th:href="@{/cadastro}" class="hover:underline">Cadastro</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+</body>
+</html>
