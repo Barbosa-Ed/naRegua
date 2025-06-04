@@ -6,17 +6,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 
-@Entity // Indica que esta classe é uma entidade JPA e será mapeada para uma tabela no banco
+@Entity
 public class Barbearia {
 
-    @Id // Marca o campo 'id' como chave primária
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Configura a geração automática do ID
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false) // Indica que o campo não pode ser nulo
+    @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false, unique = true) // Email único
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
@@ -27,8 +27,12 @@ public class Barbearia {
 
     @Column
     private String endereco;
+
     @Column
     private String urlFotoPerfil;
+
+    @Column // Novo campo para a URL da foto de capa
+    private String urlFotoCapa;
 
     public Barbearia() {
     }
@@ -41,6 +45,7 @@ public class Barbearia {
         this.telefone = telefone;
         this.endereco = endereco;
         this.urlFotoPerfil = urlFotoPerfil;
+        this.urlFotoCapa = urlFotoCapa; // Inicializa o novo campo
     }
 
     public Long getId() {
@@ -99,6 +104,15 @@ public class Barbearia {
         this.urlFotoPerfil = urlFotoPerfil;
     }
 
+    // Novo getter e setter para urlFotoCapa
+    public String getUrlFotoCapa() {
+        return urlFotoCapa;
+    }
+
+    public void setUrlFotoCapa(String urlFotoCapa) {
+        this.urlFotoCapa = urlFotoCapa;
+    }
+
     @Override
     public String toString() {
         return "Barbearia{" +
@@ -109,6 +123,7 @@ public class Barbearia {
                 ", telefone='" + telefone + '\'' +
                 ", endereco='" + endereco + '\'' +
                 ", urlFotoPerfil='" + urlFotoPerfil + '\'' +
+                ", urlFotoCapa='" + urlFotoCapa + '\'' + // Adicionado ao toString
                 '}';
     }
 }

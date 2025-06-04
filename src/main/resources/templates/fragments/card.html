@@ -5,9 +5,21 @@
     <title>Card</title>
 </head>
 <body>
-<div class="bg-white rounded-lg overflow-hidden w-52 shadow-md text-center" th:fragment="card">
-    <img src="https://i.pinimg.com/736x/ba/92/7f/ba927ff34cd961ce2c184d47e8ead9f6.jpg" alt="Estilo Masculino" class="w-full h-36 object-cover" />
-    <p class="p-2 text-sm"><strong>Estilo Masculino</strong><br><span class="text-gray-600">Corte - ⭐ 4.8 - 0,5 km</span></p>
+<div class="bg-black inline-block rounded-xl overflow-hidden shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition duration-300 ease-in-out" th:fragment="card(barbearia)">
+    <div th:if="${barbearia != null}">
+        <a th:href="@{'/negocios/perfil/' + ${barbearia.id}}" class="block">
+            <img th:src="${#strings.isEmpty(barbearia.urlFotoPerfil) == false} ? ${barbearia.urlFotoPerfil} : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'"
+                 th:alt="${barbearia.nome}"
+                 class="w-full h-40 object-cover object-center rounded-t-xl" />
+            <div class="p-4 text-center">
+                <h3 class="text-xl font-semibold text-gray-900 truncate" th:text="${barbearia.nome}">Nome da Barbearia</h3>
+                <p class="text-sm text-gray-600 mt-1" th:text="${barbearia.telefone}">Telefone</p>
+            </div>
+        </a>
+    </div>
+    <div th:if="${barbearia == null}" class="p-4 text-center text-gray-500">
+        <p>Informações da barbearia indisponíveis.</p>
+    </div>
 </div>
 </body>
 </html>

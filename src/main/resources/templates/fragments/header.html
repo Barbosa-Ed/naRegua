@@ -11,18 +11,35 @@
         <a th:href="@{/}" class="text-2xl font-bold">NaRégua</a>
         <nav>
             <ul class="flex space-x-4">
-                <li><a th:href="@{/index}" class="hover:underline">Início</a></li>
+                <li><a th:href="@{/}" class="hover:underline">Início</a></li>
                 <li><a th:href="@{/servicos}" class="hover:underline">Serviços</a></li>
                 <li><a th:href="@{/contato}" class="hover:underline">Contato</a></li>
-                <li th:if="${session.loggedInUser}"> Olá, <span th:text="${session.loggedInUser.nome}"></span>!
+
+                <li th:if="${session.loggedInUser != null}">
+                    Olá, <span th:text="${session.loggedInUser.nome}"></span>!
                 </li>
-                <li th:if="${session.loggedInUser}">
-                    <a th:href="@{/logout}" class="hover:underline">Sair</a>
+                <li th:if="${session.loggedInUser != null}">
+                    <a th:href="@{/logout}" class="hover:underline">Sair (Usuário)</a>
                 </li>
-                <li th:unless="${session.loggedInUser}"> <a th:href="@{/login}" class="hover:underline">Login</a>
+
+                <li th:if="${session.loggedInBarbearia != null}">
+                    <a th:href="@{'/negocios/perfil/' + ${session.loggedInBarbearia.id}}" class="hover:underline">Meu Perfil (Barbearia)</a>
                 </li>
-                <li th:unless="${session.loggedInUser}">
-                    <a th:href="@{/cadastro}" class="hover:underline">Cadastro</a>
+                <li th:if="${session.loggedInBarbearia != null}">
+                    <a th:href="@{/negocios/logoutBarbearia}" class="hover:underline">Sair (Barbearia)</a>
+                </li>
+
+                <li th:unless="${session.loggedInUser != null or session.loggedInBarbearia != null}">
+                    <a th:href="@{/login}" class="hover:underline">Login (Usuário)</a>
+                </li>
+                <li th:unless="${session.loggedInUser != null or session.loggedInBarbearia != null}">
+                    <a th:href="@{/cadastro}" class="hover:underline">Cadastro (Usuário)</a>
+                </li>
+                <li th:unless="${session.loggedInUser != null or session.loggedInBarbearia != null}">
+                    <a th:href="@{/negocios/loginBarbearia}" class="hover:underline">Login (Barbearia)</a>
+                </li>
+                <li th:unless="${session.loggedInUser != null or session.loggedInBarbearia != null}">
+                    <a th:href="@{/negocios/cadastroBarbearia}" class="hover:underline">Cadastro (Barbearia)</a>
                 </li>
             </ul>
         </nav>

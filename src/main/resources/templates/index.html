@@ -17,7 +17,6 @@
 
 <div class="flex flex-grow"> <aside class="w-60 p-4 bg-white border-r border-gray-200 shadow-sm">
   <ul>
-    <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">⏰ Horários disponíveis</li>
     <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">✂ Corte de cabelo</li>
     <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">🧔 Barba</li>
     <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">👁 Sobrancelha</li>
@@ -25,7 +24,6 @@
     <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">📍 Em sua região</li>
     <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">⭐ Serviços premium</li>
     <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">❤️ Favoritos</li>
-    <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">🥗 Dietas especiais</li>
   </ul>
 </aside>
 
@@ -39,9 +37,9 @@
     </section>
 
     <h2 class="text-2xl font-semibold mb-4 text-gray-800">Barbearias em destaque</h2>
-    <section class="flex flex-wrap gap-4">
-      <div th:replace="~{fragments/card :: card}"></div>
-    </section>
+      <section class="flex flex-wrap gap-4">
+        <div th:each="barbearia : ${barbearias}" th:include="~{fragments/card :: card(barbearia=${barbearia})}"></div>
+      </section>
   </main>
 </div>
 
