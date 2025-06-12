@@ -24,4 +24,7 @@ public class HomeController {
     public String cadastroBarbearia() {
         return "cadastroBarbearia";
     }
+
+    @GetMapping("/teste")
+    public String teste() {return  "teste";}
 }

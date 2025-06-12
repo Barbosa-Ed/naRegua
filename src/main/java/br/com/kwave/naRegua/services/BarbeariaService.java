@@ -21,12 +21,9 @@ public class BarbeariaService {
     @Autowired
     private BarbeariaRepository barbeariaRepository;
 
-    // Define o diretório base para upload de imagens
-    // CUIDADO: Em produção, você pode querer um caminho absoluto ou um serviço de storage em nuvem
     private final Path uploadDir = Paths.get("src/main/resources/static/img/perfil").toAbsolutePath().normalize();
 
     public BarbeariaService() {
-        // Garante que o diretório de upload exista
         try {
             Files.createDirectories(this.uploadDir);
         } catch (Exception ex) {
@@ -66,7 +63,6 @@ public class BarbeariaService {
         return barbeariaRepository.findByEmail(email).isPresent();
     }
 
-    // --- NOVOS MÉTODOS PARA UPLOAD DE IMAGEM ---
 
     public String saveFotoPerfil(MultipartFile file, Long barbeariaId) throws Exception {
         return saveImage(file, barbeariaId, "perfil");
@@ -77,21 +73,17 @@ public class BarbeariaService {
     }
 
     private String saveImage(MultipartFile file, Long barbeariaId, String type) throws Exception {
-        // Normaliza o nome do arquivo
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
-        // Gera um nome de arquivo único para evitar colisões
         String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
         Path targetLocation = this.uploadDir.resolve(uniqueFileName);
 
-        // Copia o arquivo para o destino
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-        // Atualiza a URL no banco de dados para a barbearia
         Optional<Barbearia> barbeariaOptional = barbeariaRepository.findById(barbeariaId);
         if (barbeariaOptional.isPresent()) {
             Barbearia barbearia = barbeariaOptional.get();
-            String fileUrl = "/img/perfil/" + uniqueFileName; // URL para acesso via web
+            String fileUrl = "/img/perfil/" + uniqueFileName;
 
             if ("perfil".equals(type)) {
                 barbearia.setUrlFotoPerfil(fileUrl);

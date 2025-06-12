@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barbearias - Com Mapa OpenStreetMap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoCcTzQ4+QehL7H5B9R5zN9o/aWd/V+A+c8UaA0="
+          crossorigin=""/>
+
+    <style>
+        /* Estilo para o contêiner do mapa */
+        #mapa {
+            height: 400px;
+            width: 100%;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+<header class="flex justify-between items-center bg-white p-4 border-b border-gray-200 shadow-sm">
+    <div class="text-2xl font-bold text-[#5b3921]">barbearias</div>
+    <input type="text" placeholder="Buscar barbearia" class="w-72 p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5b3921]" />
+
+    <div class="text-sm text-gray-600 flex items-center gap-2">
+        <span>Localização:</span>
+        <span id="status" class="font-semibold text-gray-700">Buscando...</span>
+        <span id="endereco" class="font-normal text-gray-800">N/A</span>
+    </div>
+
+    <div class="text-xl space-x-3 text-gray-700">🔔 ❤️ 🛒 👤</div>
+</header>
+
+<div class="flex flex-grow">
+    <aside class="w-60 p-4 bg-white border-r border-gray-200 shadow-sm">
+        <ul>
+            <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">✂ Corte de cabelo</li>
+            <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">🧔 Barba</li>
+            <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">👁 Sobrancelha</li>
+            <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">💇‍♂️ Cabelo e barba</li>
+            <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">📍 Em sua região</li>
+            <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">⭐ Serviços premium</li>
+            <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">❤️ Favoritos</li>
+        </ul>
+    </aside>
+
+    <main class="flex-1 p-8">
+        <section class="relative mb-8">
+            <img src="https://i.pinimg.com/736x/ba/92/7f/ba927ff34cd961ce2c184d47e8ead9f6.jpg" alt="Promoção" class="w-full rounded-lg h-44 object-cover" />
+            <div class="absolute top-1/2 -translate-y-1/2 left-10 text-white bg-[#5b3921]/70 p-4 rounded-lg">
+                <h2 class="text-2xl font-semibold">20% de desconto nas primeiras visitas!</h2>
+                <button class="mt-4 px-4 py-2 bg-white text-[#5b3921] rounded-md hover:bg-gray-100 transition duration-200">Agendar</button>
+            </div>
+        </section>
+
+        <h2 class="text-2xl font-semibold mb-4 text-gray-800">Mapa da sua região</h2>
+        <div id="mapa" class="mb-8 shadow-md"></div>
+
+        <h2 class="text-2xl font-semibold mb-4 text-gray-800">Barbearias em destaque</h2>
+        <section class="flex flex-wrap gap-4">
+            <div th:each="barbearia : ${barbearias}" th:include="~{fragments/card :: card(barbearia=${barbearia})}"></div>
+        </section>
+    </main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-2L+sU2jBp1QbyQ+xH8+r8+D9+y+U/a/zR/V+W+A+0A0="
+        crossorigin=""></script>
+
+<script>
+    // Variáveis globais para o mapa e o marcador
+    let map;
+    let userLocationMarker;
+
+    // Função para inicializar o mapa
+    function initializeMap(lat, lon) {
+        if (map) {
+            map.remove();
+        }
+        map = L.map('mapa').setView([lat, lon], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        userLocationMarker = L.marker([lat, lon]).addTo(map)
+            .bindPopup('Sua localização aproximada.')
+            .openPopup();
+    }
+
+    // Função para atualizar a posição do marcador
+    function updateUserMarker(lat, lon) {
+        if (userLocationMarker) {
+            userLocationMarker.setLatLng([lat, lon]);
+            map.setView([lat, lon], map.getZoom());
+        } else {
+            initializeMap(lat, lon);
+        }
+    }
+
+    // Função principal para obter a localização e o endereço
+    async function getAndDisplayLocation() {
+        document.getElementById('status').textContent = 'Buscando localização...';
+        document.getElementById('endereco').textContent = 'N/A';
+
+        if (navigator.geolocation) {
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 7000,
+                maximumAge: 0
+            };
+
+            navigator.geolocation.getCurrentPosition(
+                async function(position) {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    document.getElementById('status').textContent = 'Localização encontrada.';
+
+                    console.log("Latitude:", latitude);
+                    console.log("Longitude:", longitude);
+
+                    // Inicializa ou atualiza o mapa com a localização do usuário
+                    updateUserMarker(latitude, longitude);
+
+                    try {
+                        const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
+
+                        const response = await fetch(nominatimUrl, {
+                            headers: {
+                                'User-Agent': 'BarbeariasApp/1.0 (seu_email@example.com)'
+                            }
+                        });
+                        const data = await response.json();
+
+                        if (response.ok && data && data.display_name) {
+                            const enderecoFormatado = data.display_name;
+                            document.getElementById('endereco').textContent = enderecoFormatado;
+                            document.getElementById('status').textContent = 'Localização atual:';
+                            console.log("Endereço (Nominatim):", enderecoFormatado);
+                        } else {
+                            document.getElementById('endereco').textContent = 'Endereço não encontrado.';
+                            document.getElementById('status').textContent = 'Localização encontrada, mas endereço não disponível.';
+                            console.warn('Endereço não encontrado ou erro na API Nominatim:', data);
+                        }
+                    } catch (error) {
+                        document.getElementById('endereco').textContent = 'Erro ao buscar endereço.';
+                        document.getElementById('status').textContent = 'Localização encontrada, mas erro ao buscar endereço.';
+                        console.error('Erro ao buscar endereço via Nominatim API:', error);
+                    }
+                },
+                function(error) {
+                    let statusMessage = "Erro ao obter localização: ";
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            statusMessage = "Permissão de localização negada.";
+                            initializeMap(-22.9068, -43.1729); // Lat/Lon do Rio de Janeiro
+                            document.getElementById('status').textContent = 'Localização padrão exibida.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            statusMessage = "Localização indisponível.";
+                            initializeMap(-22.9068, -43.1729);
+                            document.getElementById('status').textContent = 'Localização padrão exibida.';
+                            break;
+                        case error.TIMEOUT:
+                            statusMessage = "Tempo limite excedido.";
+                            initializeMap(-22.9068, -43.1729);
+                            document.getElementById('status').textContent = 'Localização padrão exibida.';
+                            break;
+                        case error.UNKNOWN_ERROR:
+                            statusMessage = "Erro desconhecido.";
+                            initializeMap(-22.9068, -43.1729);
+                            document.getElementById('status').textContent = 'Localização padrão exibida.';
+                            break;
+                    }
+                    document.getElementById('endereco').textContent = 'N/A';
+                    console.error("Erro na geolocalização:", error);
+                },
+                options
+            );
+        } else {
+            document.getElementById('status').textContent = 'Geolocalização não suportada.';
+            document.getElementById('endereco').textContent = 'N/A';
+            console.error("Geolocalização não é suportada por este navegador.");
+            initializeMap(-22.9068, -43.1729);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', getAndDisplayLocation);
+</script>
+</body>
+</html>

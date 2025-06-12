@@ -5,31 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Barbearias</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    #map { height: 300px; }
+  </style>
 </head>
 <body class="font-sans bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
 <header class="flex justify-between items-center bg-white p-4 border-b border-gray-200 shadow-sm">
   <div class="text-2xl font-bold text-[#5b3921]">barbearias</div>
-  <input type="text" placeholder="Buscar barbearia" class="w-72 p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5b3921]" />
-  <div class="text-sm text-gray-600">Localização: Rua das Acácias, 456</div>
-  <div class="text-xl space-x-3 text-gray-700">🔔 ❤️ 🛒 👤</div>
+  <input type="text" id="searchInput" placeholder="Buscar barbearia" class="w-72 p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5b3921]" />
+
+  <div class="text-sm text-gray-600 flex items-center gap-2">
+    <span id="status" class="font-semibold text-gray-700">Buscando...</span>
+    <span id="endereco" class="font-normal text-gray-800">N/A</span>
+  </div>
+
+  <div class="text-xl space-x-3 text-gray-700"><a th:href="@{/login}" >👤</a></div>
 </header>
 
-<div class="flex flex-grow"> <aside class="w-60 p-4 bg-white border-r border-gray-200 shadow-sm">
-  <ul>
-    <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">✂ Corte de cabelo</li>
-    <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">🧔 Barba</li>
-    <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">👁 Sobrancelha</li>
-    <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">💇‍♂️ Cabelo e barba</li>
-    <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">📍 Em sua região</li>
-    <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">⭐ Serviços premium</li>
-    <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">❤️ Favoritos</li>
-  </ul>
-</aside>
+<div class="flex flex-grow">
+  <aside class="w-60 p-4 bg-white border-r border-gray-200 shadow-sm">
+    <ul>
+      <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">Corte de cabelo</li>
+      <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">Barba</li>
+      <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">Sobrancelha</li>
+      <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">Cabelo e barba</li>
+      <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">Em sua região</li>
+      <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">Serviços premium</li>
+      <li class="py-2 cursor-pointer text-[#5b3921] hover:bg-gray-100 rounded-md px-2 transition duration-200">Favoritos</li>
+    </ul>
+  </aside>
 
   <main class="flex-1 p-8">
     <section class="relative mb-8">
-      <img src="https://i.pinimg.com/736x/ba/92/7f/ba927ff34cd961ce2c184d47e8ead9f6.jpg" alt="Promoção" class="w-full rounded-lg h-44 object-cover" />
+      <img src="https://www.signsworldwide.com/images/thumbnails/1007/387/detailed/4/Barber-Shop-Stripes-banner.jpg" alt="Promoção" class="w-full rounded-lg h-44 object-cover" />
       <div class="absolute top-1/2 -translate-y-1/2 left-10 text-white bg-[#5b3921]/70 p-4 rounded-lg">
         <h2 class="text-2xl font-semibold">20% de desconto nas primeiras visitas!</h2>
         <button class="mt-4 px-4 py-2 bg-white text-[#5b3921] rounded-md hover:bg-gray-100 transition duration-200">Agendar</button>
@@ -37,11 +47,145 @@
     </section>
 
     <h2 class="text-2xl font-semibold mb-4 text-gray-800">Barbearias em destaque</h2>
-      <section class="flex flex-wrap gap-4">
-        <div th:each="barbearia : ${barbearias}" th:include="~{fragments/card :: card(barbearia=${barbearia})}"></div>
-      </section>
+    <section id="barberiaList" class="flex flex-wrap gap-4">
+      <div th:each="barbearia : ${barbearias}" th:id="'barbearia-' + ${barbearia.id}" th:data-name="${barbearia.nome}" th:include="~{fragments/card :: card(barbearia=${barbearia})}"></div>
+    </section>
+
+    <div id="map" class="mt-4"></div>
   </main>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script th:inline="javascript">
+  //const allBarbearias = ${barbearia}; ignora
+
+  let map;
+  let userLocationMarker;
+
+  function initializeMap(lat, lon) {
+    if (map) {
+      map.remove();
+    }
+    map = L.map('map').setView([lat, lon], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    userLocationMarker = L.marker([lat, lon]).addTo(map)
+            .bindPopup("Sua localização")
+            .openPopup();
+  }
+
+  async function getAndDisplayLocation() {
+    document.getElementById('status').textContent = 'Buscando localização...';
+    document.getElementById('endereco').textContent = 'N/A';
+
+    if (navigator.geolocation) {
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 7000,
+        maximumAge: 0
+      };
+
+      navigator.geolocation.getCurrentPosition(
+              async function(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                document.getElementById('status').textContent = 'Localização encontrada.';
+                console.log("Latitude:", latitude);
+                console.log("Longitude:", longitude);
+
+                initializeMap(latitude, longitude);
+
+                try {
+                  const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
+
+                  const data = await response.json();
+
+                  if (response.ok && data && data.display_name) {
+                    const road = data.address.road || '';
+                    const neighbourhood = data.address.neighbourhood || data.address.suburb || data.address.village || '';
+                    let enderecoFormatado = '';
+
+                    if (road && neighbourhood) {
+                      enderecoFormatado = `${road}, ${neighbourhood}`;
+                    } else if (road) {
+                      enderecoFormatado = road;
+                    } else if (neighbourhood) {
+                      enderecoFormatado = neighbourhood;
+                    } else {
+                      enderecoFormatado = data.display_name;
+                    }
+
+                    document.getElementById('endereco').textContent = enderecoFormatado;
+                    document.getElementById('status').textContent = 'Localização atual:';
+                    console.log("Endereço (Nominatim):", enderecoFormatado);
+                  } else {
+                    document.getElementById('endereco').textContent = 'Endereço não encontrado.';
+                    document.getElementById('status').textContent = 'Localização encontrada, mas endereço não disponível.';
+                    console.warn('Endereço não encontrado ou erro na API Nominatim:', data);
+                  }
+                } catch (error) {
+                  document.getElementById('endereco').textContent = 'Erro ao buscar endereço.';
+                  document.getElementById('status').textContent = 'Erro ao buscar endereço.';
+                  console.error('Erro ao buscar endereço via Nominatim API:', error);
+                }
+              },
+              function(error) {
+                let statusMessage = "Erro ao obter localização: ";
+                switch(error.code) {
+                  case error.PERMISSION_DENIED:
+                    statusMessage = "Permissão de localização negada.";
+                    break;
+                  case error.POSITION_UNAVAILABLE:
+                    statusMessage = "Localização indisponível.";
+                    break;
+                  case error.TIMEOUT:
+                    statusMessage = "Tempo limite excedido.";
+                    break;
+                  case error.UNKNOWN_ERROR:
+                    statusMessage = "Um erro desconhecido ocorreu.";
+                    break;
+                }
+                document.getElementById('status').textContent = statusMessage;
+                document.getElementById('endereco').textContent = 'N/A';
+                initializeMap(-22.9068, -43.1729);
+                console.error("Erro na geolocalização:", error);
+              },
+              options
+      );
+    } else {
+      document.getElementById('status').textContent = 'Geolocalização não suportada.';
+      document.getElementById('endereco').textContent = 'N/A';
+      initializeMap(-22.9068, -43.1729);
+      console.error("Geolocalização não é suportada por este navegador.");
+    }
+  }
+
+  function filterBarberias() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const barbeariaCards = document.querySelectorAll('#barberiaList > div');
+
+    barbeariaCards.forEach(card => {
+      const barbeariaName = card.dataset.name ? card.dataset.name.toLowerCase() : '';
+
+      if (searchTerm === '' || barbeariaName.includes(searchTerm)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', getAndDisplayLocation);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', filterBarberias);
+    }
+  });
+</script>
 </body>
 </html>

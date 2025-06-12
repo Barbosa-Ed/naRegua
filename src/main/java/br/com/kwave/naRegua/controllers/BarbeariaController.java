@@ -94,11 +94,10 @@ public class BarbeariaController {
     }
 
     // Método para exibir o formulário de adicionar serviço
-    @GetMapping("/adicionarServico/{barbeariaId}") // Renomeado o PathVariable para clareza
+    @GetMapping("/adicionarServico/{barbeariaId}")
     public String showAdicionarServicoForm(@PathVariable Long barbeariaId, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
         Barbearia loggedInBarbearia = (Barbearia) session.getAttribute("loggedInBarbearia");
 
-        // Acesso negado se não houver barbearia logada OU o ID da URL não corresponder à barbearia logada
         if (loggedInBarbearia == null || !loggedInBarbearia.getId().equals(barbeariaId)) {
             redirectAttributes.addFlashAttribute("errorMessage", "Acesso negado. Faça login como a barbearia correta para adicionar serviços.");
             return "redirect:/negocios/loginBarbearia";
@@ -107,14 +106,13 @@ public class BarbeariaController {
         var barbeariaOptional = barbeariaService.findBarbeariaById(barbeariaId);
         if (barbeariaOptional.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Barbearia não encontrada.");
-            return "redirect:/"; // Ou para o perfil da barbearia logada
+            return "redirect:/";
         }
 
-        // Preenche o Servico com a barbearia antes de enviar para o formulário
         Servico novoServico = new Servico();
-        novoServico.setBarbearia(loggedInBarbearia); // Associa o serviço à barbearia logada
+        novoServico.setBarbearia(loggedInBarbearia);
         model.addAttribute("servico", novoServico);
-        model.addAttribute("barbearia", loggedInBarbearia); // Para exibir o nome da barbearia na tela de adicionar
+        model.addAttribute("barbearia", loggedInBarbearia);
         return "adicionarServico";
     }
 
@@ -123,18 +121,16 @@ public class BarbeariaController {
     public String saveServico(@ModelAttribute Servico servico, HttpSession session, RedirectAttributes redirectAttributes) {
         Barbearia loggedInBarbearia = (Barbearia) session.getAttribute("loggedInBarbearia");
 
-        // Verifica se há uma barbearia logada
         if (loggedInBarbearia == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "Você precisa estar logado como uma barbearia para adicionar serviços.");
             return "redirect:/negocios/loginBarbearia";
         }
 
-        // Garante que o serviço será associado à barbearia LOGADA, e não a um ID possivelmente manipulado no formulário
         servico.setBarbearia(loggedInBarbearia);
 
         servicoService.saveServico(servico);
         redirectAttributes.addFlashAttribute("successMessage", "Serviço adicionado com sucesso!");
-        return "redirect:/negocios/perfil/" + loggedInBarbearia.getId(); // Redireciona para o perfil da barbearia logada
+        return "redirect:/negocios/perfil/" + loggedInBarbearia.getId();
     }
 
 

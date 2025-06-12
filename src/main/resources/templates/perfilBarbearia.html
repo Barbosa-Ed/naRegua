@@ -6,17 +6,25 @@
   <title th:text="${barbearia.nome} + ' - Perfil'">Perfil da Barbearia</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <div th:replace="~{fragments/header :: mainHeader}"></div>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <style>
+    /* NOVO: Estilo para o contêiner do mapa */
+    #barberiaMap {
+      height: 400px; /* Altura do mapa */
+      width: 100%;
+      border-radius: 0.5rem; /* Para combinar com o estilo do Tailwind */
+      margin-top: 2rem; /* Espaçamento superior */
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Sombra para o mapa */
+    }
+  </style>
 </head>
 <body class="font-sans bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
 <main class="flex-grow p-8 container mx-auto">
   <div class="bg-white rounded-lg shadow-xl overflow-hidden mb-8">
     <div class="relative h-64 bg-gray-200">
-      <img th:src="${#strings.isEmpty(barbearia.urlFotoCapa) == false} ? ${barbearia.urlFotoCapa} : 'https://images.unsplash.com/photo-1503728065774-fe79b5bc7470?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80'"
-           alt="Capa da Barbearia"
-           class="w-full h-full object-cover"
-           th:classappend="${isOwner} ? 'cursor-pointer' : ''"
-           id="fotoCapa" />
       <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
 
       <div class="absolute bottom-4 left-8">
@@ -47,7 +55,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <p class="text-gray-700 font-semibold">Endereço:</p>
-          <p class="text-gray-900" th:text="${barbearia.endereco}"></p>
+          <p class="text-gray-900" th:text="${barbearia.endereco}" id="barbeariaEndereco"></p>
         </div>
         <div>
           <p class="text-gray-700 font-semibold">Telefone:</p>
@@ -90,6 +98,8 @@
     </div>
   </section>
 
+  <div id="barberiaMap"></div>
+
   <div class="text-center mt-8">
     <a href="/" class="inline-block px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-200 shadow-md">
       Voltar para a Página Inicial
@@ -99,7 +109,60 @@
 
 <div th:replace="~{fragments/footer :: mainFooter}"></div>
 
-<script th:if="${isOwner}">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script th:inline="javascript">
+  let barberiaMapInstance;
+  let barberiaMarker;
+
+  function initializeBarberiaMap(lat, lon, barbeariaName) {
+    if (barberiaMapInstance) {
+      barberiaMapInstance.remove();
+    }
+    barberiaMapInstance = L.map('barberiaMap').setView([lat, lon], 16);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(barberiaMapInstance);
+
+    barberiaMarker = L.marker([lat, lon]).addTo(barberiaMapInstance)
+            .bindPopup(`<b>${barbeariaName}</b><br>Aqui está a barbearia!`)
+            .openPopup();
+  }
+
+  async function displayBarberiaOnMap() {
+    const barbeariaAddress ='Endereço da Barbearia';
+    const barbeariaName = [[${barbearia.nome}]];
+
+    if (!barbeariaAddress || barbeariaAddress === 'Endereço da Barbearia') {
+      console.warn("Endereço da barbearia não disponível para exibição no mapa.");
+      initializeBarberiaMap(-23.5505, -46.6333, "Local Padrão");
+      return;
+    }
+
+    try {
+      const nominatimSearchUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(barbeariaAddress)}&format=jsonv2&limit=1&countrycodes=br&accept-language=pt-BR`;
+
+      const data = await response.json();
+
+      if (response.ok && data && data.length > 0) {
+        const firstResult = data[0];
+        const latitude = parseFloat(firstResult.lat);
+        const longitude = parseFloat(firstResult.lon);
+
+        initializeBarberiaMap(latitude, longitude, barbeariaName);
+        console.log(`Mapa da Barbearia ${barbeariaName} exibido em: ${latitude}, ${longitude}`);
+      } else {
+        console.warn(`Endereço "${barbeariaAddress}" não encontrado via Nominatim.`);
+        initializeBarberiaMap(-23.5505, -46.6333, "Local Padrão");
+      }
+    } catch (error) {
+      console.error('Erro ao buscar endereço da barbearia via Nominatim Search API:', error);
+      initializeBarberiaMap(-23.5505, -46.6333, "Local Padrão");
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', displayBarberiaOnMap);
+
   document.getElementById('fotoPerfil').addEventListener('click', function() {
     document.getElementById('inputFotoPerfil').click();
   });
@@ -110,28 +173,22 @@
 
   document.getElementById('inputFotoPerfil').addEventListener('change', function() {
     if (this.files && this.files[0]) {
-      // Opcional: mostrar pré-visualização da imagem
       const reader = new FileReader();
       reader.onload = function(e) {
         document.getElementById('fotoPerfil').src = e.target.result;
       };
       reader.readAsDataURL(this.files[0]);
-
-      // Envia o formulário automaticamente
       document.getElementById('formUploadFotoPerfil').submit();
     }
   });
 
   document.getElementById('inputFotoCapa').addEventListener('change', function() {
     if (this.files && this.files[0]) {
-      // Opcional: mostrar pré-visualização da imagem
       const reader = new FileReader();
       reader.onload = function(e) {
         document.getElementById('fotoCapa').src = e.target.result;
       };
       reader.readAsDataURL(this.files[0]);
-
-      // Envia o formulário automaticamente
       document.getElementById('formUploadFotoCapa').submit();
     }
   });

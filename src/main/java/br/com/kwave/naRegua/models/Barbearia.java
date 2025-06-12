@@ -31,7 +31,7 @@ public class Barbearia {
     @Column
     private String urlFotoPerfil;
 
-    @Column // Novo campo para a URL da foto de capa
+    @Column
     private String urlFotoCapa;
 
     public Barbearia() {
@@ -45,7 +45,7 @@ public class Barbearia {
         this.telefone = telefone;
         this.endereco = endereco;
         this.urlFotoPerfil = urlFotoPerfil;
-        this.urlFotoCapa = urlFotoCapa; // Inicializa o novo campo
+        this.urlFotoCapa = urlFotoCapa;
     }
 
     public Long getId() {
@@ -104,7 +104,6 @@ public class Barbearia {
         this.urlFotoPerfil = urlFotoPerfil;
     }
 
-    // Novo getter e setter para urlFotoCapa
     public String getUrlFotoCapa() {
         return urlFotoCapa;
     }
@@ -123,7 +122,7 @@ public class Barbearia {
                 ", telefone='" + telefone + '\'' +
                 ", endereco='" + endereco + '\'' +
                 ", urlFotoPerfil='" + urlFotoPerfil + '\'' +
-                ", urlFotoCapa='" + urlFotoCapa + '\'' + // Adicionado ao toString
+                ", urlFotoCapa='" + urlFotoCapa + '\'' +
                 '}';
     }
 }

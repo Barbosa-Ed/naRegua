@@ -12,8 +12,6 @@
         <nav>
             <ul class="flex space-x-4">
                 <li><a th:href="@{/}" class="hover:underline">Início</a></li>
-                <li><a th:href="@{/servicos}" class="hover:underline">Serviços</a></li>
-                <li><a th:href="@{/contato}" class="hover:underline">Contato</a></li>
 
                 <li th:if="${session.loggedInUser != null}">
                     Olá, <span th:text="${session.loggedInUser.nome}"></span>!
